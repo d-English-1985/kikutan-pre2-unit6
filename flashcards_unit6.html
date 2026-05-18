@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リズムでキクタン準2 Unit 6 フラッシュカード</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: #1e1e24;
+    background-image: radial-gradient(circle at 20% 10%, #2a2a35 0%, #1a1a20 70%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #ff9a3c;
+    margin-bottom: 6px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .subtitle {
+    color: #c8c8d0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .progress {
+    color: #ffd28a;
+    font-size: 18px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .progress-bar {
+    width: 100%;
+    max-width: 600px;
+    height: 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff9a3c 0%, #6bcb77 100%);
+    transition: width 0.3s;
+  }
+  .card-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 600px;
+    height: 430px;
+    margin-bottom: 18px;
+  }
+  .card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: #fafafa;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px solid #ff9a3c;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+    background: #fff8ee;
+    justify-content: flex-start;
+    padding-top: 32px;
+    overflow-y: auto;
+    border: 2px solid #6bcb77;
+  }
+  .word {
+    font-size: 40px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+  .phonetic {
+    font-size: 20px;
+    color: #e67e22;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .pos {
+    font-size: 13px;
+    color: #555;
+    font-style: italic;
+    background: #ececec;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .tap-hint {
+    position: absolute;
+    bottom: 16px;
+    font-size: 13px;
+    color: #888;
+  }
+  .meaning {
+    font-size: 28px;
+    color: #c0392b;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .example-label {
+    font-size: 12px;
+    color: #27ae60;
+    margin-bottom: 6px;
+    align-self: flex-start;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .example {
+    font-size: 15px;
+    color: #2c3e50;
+    line-height: 1.6;
+    background: white;
+    padding: 14px;
+    border-radius: 10px;
+    border-left: 4px solid #27ae60;
+    margin-bottom: 10px;
+    text-align: left;
+    width: 100%;
+  }
+  .example-jp {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.5;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .audio-btn {
+    background: #ff7e3c;
+    color: white;
+    border: 2px solid #d35400;
+    padding: 10px 22px;
+    border-radius: 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .audio-btn:hover { background: #d35400; }
+  .audio-btn.green { background: #27ae60; border-color: #1e8449; }
+  .audio-btn.green:hover { background: #1e8449; }
+  .speed-control {
+    background: white;
+    padding: 7px 14px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #2c3e50;
+    font-weight: 500;
+    border: 2px solid #d35400;
+  }
+  .speed-control select {
+    border: 2px solid #ff7e3c;
+    border-radius: 15px;
+    padding: 3px 8px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+    font-weight: 700;
+    color: #d35400;
+    outline: none;
+  }
+  .nav-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .nav-btn {
+    padding: 12px 28px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    border: 2px solid;
+    transition: all 0.2s;
+  }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .nav-btn.white { background: #ffffff; color: #1e1e24; border-color: #ffffff; }
+  .nav-btn.white:hover:not(:disabled) { background: #e0e0e0; }
+  .nav-btn.orange { background: #ff7e3c; color: #ffffff; border-color: #d35400; }
+  .nav-btn.orange:hover:not(:disabled) { background: #d35400; }
+  .nav-btn.green { background: #27ae60; color: #ffffff; border-color: #1e8449; }
+  .nav-btn.green:hover:not(:disabled) { background: #1e8449; }
+  .list-toggle {
+    display: block;
+    margin: 18px auto 0;
+    background: #ff7e3c;
+    color: #ffffff;
+    border: 2px solid #d35400;
+    padding: 9px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .list-toggle:hover { background: #d35400; }
+  .word-list {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    border: 2px solid #ff9a3c;
+  }
+  .word-list.show { display: block; }
+  .list-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e8e8e8;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .list-item:hover { background: #fff8ee; }
+  .list-item.current { background: #fff0e0; font-weight: 700; border-left: 4px solid #ff7e3c; }
+  .list-num { color: #d35400; min-width: 28px; font-weight: 700; }
+  .list-word { flex: 1; color: #2c3e50; }
+  .list-meaning { color: #1e8449; font-size: 13px; font-weight: 500; }
+  
+  @media (max-width: 480px) {
+    .card-container { height: 480px; }
+    .word { font-size: 32px; }
+    .meaning { font-size: 22px; }
+    .example { font-size: 14px; }
+    .nav-btn { padding: 10px 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+  <h1>リズムでキクタン準2 Unit 6</h1>
+  <div class="subtitle">英検準2級レベル 重要単語10選</div>
+  
+  <div class="progress" id="progress">1 / 10</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  
+  <div class="card-container">
+    <div class="card" id="card" onclick="flipCard(event)">
+      <div class="card-face">
+        <div class="word" id="word"></div>
+        <div class="phonetic" id="phonetic"></div>
+        <div class="pos" id="pos"></div>
+        <div class="controls" onclick="event.stopPropagation()">
+          <button class="audio-btn" onclick="playWord()">🔊 単語を再生</button>
+          <span class="speed-control">速度
+            <select id="speedSelect" onchange="updateSpeed()">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1.0" selected>1.0x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </span>
+        </div>
+        <div class="tap-hint">👆 タップで意味を表示</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="meaning" id="meaning"></div>
+        <div class="example-label">📖 例文</div>
+        <div class="example" id="example"></div>
+        <div class="example-jp" id="exampleJp"></div>
+        <div class="controls" onclick="event.stopPropagation()">
+          <button class="audio-btn green" onclick="playExample()">🔊 例文を再生</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="nav-controls">
+    <button class="nav-btn white" id="prevBtn" onclick="prevCard()">← 前へ</button>
+    <button class="nav-btn orange" onclick="shuffle()">🔀 シャッフル</button>
+    <button class="nav-btn green" onclick="reset()">🔄 リセット</button>
+    <button class="nav-btn white" id="nextBtn" onclick="nextCard()">次へ →</button>
+  </div>
+  
+  <button class="list-toggle" onclick="toggleList()">📋 単語一覧を表示</button>
+  
+  <div class="word-list" id="wordList"></div>
+
+<script>
+const original = [
+  { word: "forecast", phonetic: "/ˈfɔːrkæst/", pos: "名詞 (noun)", meaning: "予報", example: "The weather forecast says it will rain tomorrow.", exampleJp: "天気予報によると明日は雨が降るそうです。" },
+  { word: "citizen", phonetic: "/ˈsɪtɪzn/", pos: "名詞 (noun)", meaning: "市民", example: "Every citizen has the right to vote.", exampleJp: "すべての市民には投票する権利があります。" },
+  { word: "dormitory", phonetic: "/ˈdɔːrmɪtɔːri/", pos: "名詞 (noun)", meaning: "寮", example: "My brother lives in a school dormitory.", exampleJp: "私の兄は学校の寮に住んでいます。" },
+  { word: "belief", phonetic: "/bɪˈliːf/", pos: "名詞 (noun)", meaning: "信じること、信念", example: "She has a strong belief that she can succeed.", exampleJp: "彼女は成功できるという強い信念を持っています。" },
+  { word: "instead", phonetic: "/ɪnˈsted/", pos: "副詞 (adverb)", meaning: "代わりに", example: "I didn't have coffee. I drank tea instead.", exampleJp: "私はコーヒーを飲みませんでした。代わりに紅茶を飲みました。" },
+  { word: "audience", phonetic: "/ˈɔːdiəns/", pos: "名詞 (noun)", meaning: "観客、聴衆", example: "The audience clapped loudly after the show.", exampleJp: "ショーの後、観客は大きな拍手をしました。" },
+  { word: "director", phonetic: "/dəˈrektər/", pos: "名詞 (noun)", meaning: "監督、責任者", example: "The director of the movie is very famous.", exampleJp: "その映画の監督はとても有名です。" },
+  { word: "neighbor", phonetic: "/ˈneɪbər/", pos: "名詞 (noun)", meaning: "隣人、近所の人", example: "My neighbor often helps me carry heavy bags.", exampleJp: "私の隣人はよく重い荷物を運ぶのを手伝ってくれます。" },
+  { word: "customer", phonetic: "/ˈkʌstəmər/", pos: "名詞 (noun)", meaning: "客、顧客", example: "The shop has many customers on weekends.", exampleJp: "その店は週末になると多くの客が来ます。" },
+  { word: "create", phonetic: "/kriˈeɪt/", pos: "動詞 (verb)", meaning: "創作する、作り出す", example: "She wants to create a new design for the poster.", exampleJp: "彼女はポスターの新しいデザインを作りたいと思っています。" }
+];
+
+let cards = original.map(c => ({...c}));
+let currentIndex = 0;
+let speed = 1.0;
+let englishVoice = null;
+
+function initVoices() {
+  const voices = speechSynthesis.getVoices();
+  englishVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
+                 voices.find(v => v.lang === 'en-US') ||
+                 voices.find(v => v.lang === 'en-GB') ||
+                 voices.find(v => v.lang.startsWith('en'));
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoices;
+initVoices();
+
+function renderCard() {
+  const c = cards[currentIndex];
+  document.getElementById('word').textContent = c.word;
+  document.getElementById('phonetic').textContent = c.phonetic;
+  document.getElementById('pos').textContent = c.pos;
+  document.getElementById('meaning').textContent = c.meaning;
+  document.getElementById('example').textContent = c.example;
+  document.getElementById('exampleJp').textContent = c.exampleJp;
+  document.getElementById('progress').textContent = (currentIndex + 1) + ' / ' + cards.length;
+  document.getElementById('progressFill').style.width = Math.round(((currentIndex + 1) / cards.length) * 100) + '%';
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('prevBtn').disabled = currentIndex === 0;
+  document.getElementById('nextBtn').disabled = currentIndex === cards.length - 1;
+  updateWordList();
+}
+
+function flipCard(e) {
+  if (e.target.closest('.controls')) return;
+  document.getElementById('card').classList.toggle('flipped');
+}
+
+function nextCard() {
+  if (currentIndex < cards.length - 1) { currentIndex++; renderCard(); }
+}
+
+function prevCard() {
+  if (currentIndex > 0) { currentIndex--; renderCard(); }
+}
+
+function updateSpeed() {
+  speed = parseFloat(document.getElementById('speedSelect').value);
+}
+
+function playWord() {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(cards[currentIndex].word);
+  u.lang = 'en-US';
+  u.rate = speed;
+  if (englishVoice) u.voice = englishVoice;
+  speechSynthesis.speak(u);
+}
+
+function playExample() {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(cards[currentIndex].example);
+  u.lang = 'en-US';
+  u.rate = speed;
+  if (englishVoice) u.voice = englishVoice;
+  speechSynthesis.speak(u);
+}
+
+function shuffle() {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+function reset() {
+  cards = original.map(c => ({...c}));
+  currentIndex = 0;
+  renderCard();
+}
+
+function toggleList() {
+  document.getElementById('wordList').classList.toggle('show');
+}
+
+function updateWordList() {
+  const list = document.getElementById('wordList');
+  list.innerHTML = cards.map((c, i) =>
+    '<div class="list-item ' + (i === currentIndex ? 'current' : '') + '" onclick="jumpTo(' + i + ')">' +
+    '<span class="list-num">' + (i + 1) + '.</span>' +
+    '<span class="list-word">' + c.word + '</span>' +
+    '<span class="list-meaning">' + c.meaning + '</span>' +
+    '</div>'
+  ).join('');
+}
+
+function jumpTo(i) {
+  currentIndex = i;
+  renderCard();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); document.getElementById('card').classList.toggle('flipped'); }
+});
+
+renderCard();
+</script>
+</body>
+</html>
